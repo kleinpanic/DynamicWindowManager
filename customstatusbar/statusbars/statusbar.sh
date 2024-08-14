@@ -40,7 +40,7 @@ cpu() {
     local status_line=""
     status_line+="^c${grey}^^r${base_x},${base_y},${bar_width},${max_height}^"
     status_line+="^c${color}^^r${base_x},${usage_y},${bar_width},${usage_height}^"
-    status_line+="^d^^f5^"
+    status_line+="^d^^f7^"
     local topcon=$( ps -eo %cpu,comm --sort=-%cpu | head -n 2 | tail -n 1 | awk '{print $2}')
 	topcon="${topcon:0:5}" # trunkate output
     echo "{CPU:${status_line}${usage}% : ${topcon}}"
@@ -56,7 +56,7 @@ ram() {
     local status_line=""
     status_line+="^c$grey^^r$base_x,${base_y},${bar_width},${max_height}^"
     status_line+="^c$white^^r${base_x},${usage_y},${bar_width},${usage_height}^"
-    status_line+="^d^^f5^"
+    status_line+="^d^^f7^"
     status_line+="${p_mem}%"
     echo "{Mem:$status_line}"
 }
@@ -74,7 +74,7 @@ swap() {
     local status_line=""
     status_line+="^c$grey^^r$base_x,${base_y},${bar_width},${max_height}^"
     status_line+="^c$white^^r${base_x},${usage_y},${bar_width},${usage_height}^"
-    status_line+="^d^^f5^"
+    status_line+="^d^^f7^"
     status_line+="${p_swap}%"
     echo "{Swap:$status_line}|"
 }
@@ -118,7 +118,7 @@ cpu_temperature(){
     local usage_height=$(($temp * 10 / $max_temp))
     local usage_y=$((adj_y + 10 - usage_height))
     local temp_icon="^c$black^"
-    temp_icon+="^r7,${base_y},5,15^" #Bar behind the green
+    temp_icon+="^r7,${base_y},5,15^" #Bar behind the fill
     temp_icon+="^c$color^"
     temp_icon+="^r8,${usage_y},3,${usage_height}^" # Fill Bar 
     temp_icon+="^c$black^"
@@ -171,14 +171,17 @@ wifi() {
     ssid="${ssid:-No WiFi}"
     ssid="${ssid:0:15}"
     local dwm=$(grep wlp0s20f3 /proc/net/wireless | awk '{ print int($4) }')
-    local signal_normalized=$(( (dwm + 90) * 100 / 60 ))
-    local signal
-    if [ $signal_normalized -gt 100 ]; then
-        signal=100
-    elif [ $signal_normalized -lt 0 ]; then
-        signal=0
-    else
-        signal=$signal_normalized
+    if [ "$ssid" = "No WiFi" ]; then
+        local signal=0
+    else 
+        local signal_normalized=$(( (dwm + 90) * 100 / 60 ))
+        if [ $signal_normalized -gt 100 ]; then
+            signal=100
+        elif [ $signal_normalized -lt 0 ]; then
+            signal=0
+        else
+            signal=$signal_normalized
+        fi
     fi
 
     local color=$white
@@ -209,12 +212,9 @@ wifi() {
 
     echo "{ $wifi_icon$ssid : $signal% }"
 }
-
 status(){
     echo "$(cpu)|$(ram)|$(swap)$(disk)|$(cpu_temperature)|$(battery)|$(wifi)"
 }
 while true; do
     xsetroot -name "$(status)"
 done
-
-
