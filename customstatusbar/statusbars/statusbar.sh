@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Source color vars
-source /home/klein/KleinWindowManagement/customstatusbar/statusbars/colorvars.sh
+source /home/klein/DynamicWindowManagement/customstatusbar/statusbars/colorvars.sh
 
 # Define Basic Dimentions
 base_x=0
@@ -212,6 +212,7 @@ wifi() {
 
     echo "{ $wifi_icon$ssid : $signal% }"
 }
+
 status(){
     echo "$(cpu)|$(ram)|$(swap)$(disk)|$(cpu_temperature)|$(battery)|$(wifi)"
 }

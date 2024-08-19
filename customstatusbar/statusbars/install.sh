@@ -32,7 +32,7 @@ for pkg in "${requires_packages[@]}"; do
         echo "Package $pkg is installed already. YAY"
     fi 
 done 
-sudo chmod +x /home/klein/KleinWindowManagement/customstatusbar/statusbars/statusbar.sh
-sudo cp /home/klein/KleinWindowManagement/customstatusbar/statusbars/statusbar.sh /usr/bin/
+sudo chmod +x /home/klein/DynamicWindowManagement//customstatusbar/statusbars/statusbar.sh
+sudo cp /home/klein/DynamicWindowManagement/customstatusbar/statusbars/statusbar.sh /usr/bin/
 
 echo "Installation done. Run statusbar.sh in shell"
