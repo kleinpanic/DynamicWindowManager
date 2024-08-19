@@ -33,6 +33,6 @@ for pkg in "${requires_packages[@]}"; do
     fi 
 done 
 sudo chmod +x /home/klein/DynamicWindowManagement//customstatusbar/statusbars/statusbar.sh
-sudo cp /home/klein/DynamicWindowManagement/customstatusbar/statusbars/statusbar.sh /usr/bin/
+sudo ln -s /home/klein/DynamicWindowManagement/customstatusbar/statusbars/statusbar.sh /usr/local/bin/statusbar
 
-echo "Installation done. Run statusbar.sh in shell"
+echo "Installation done. Run statusbar in shell. Installed to local bin"

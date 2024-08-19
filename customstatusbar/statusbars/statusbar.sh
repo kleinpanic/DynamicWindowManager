@@ -51,7 +51,7 @@ ram() {
     local t_mem=$(echo "$m_mem" | awk '/^Mem:/ {print $2}')
     local u_mem=$(echo "$m_mem" | awk '/^Mem:/ {print $3}')
     local p_mem=$(awk "BEGIN {printf \"%.0f\", ($u_mem/$t_mem)*100}")
-    local usage_height=$((max_height * mem_usage / 100))
+    local usage_height=$((max_height * p_mem / 100))
     local usage_y=$((base_y + max_height - usage_height))
     local status_line=""
     status_line+="^c$grey^^r$base_x,${base_y},${bar_width},${max_height}^"
@@ -63,13 +63,13 @@ ram() {
 
 swap() {
     local m_swap=$(free -m)
-    local t_swap=$(echo "$m_mem" | awk '/^Swap:/ {print $2}')
-    local u_swap=$(echo "$m_mem" | awk '/^Swap:/ {print $3}')
+    local t_swap=$(echo "$m_swap" | awk '/^Swap:/ {print $2}')
+    local u_swap=$(echo "$m_swap" | awk '/^Swap:/ {print $3}')
     if [[ "$u_swap" -eq 0 ]]; then
         return
     fi
     local p_swap=$(awk "BEGIN {printf \"%.0f\", ($u_swap/$t_swap)*100}")
-    local usage_height=$((max_height * mem_usage / 100))
+    local usage_height=$((max_height * p_swap / 100))
     local usage_y=$((base_y + max_height - usage_height))
     local status_line=""
     status_line+="^c$grey^^r$base_x,${base_y},${bar_width},${max_height}^"
@@ -167,10 +167,11 @@ battery() {
 }
 
 wifi() {
+    local iface=$(ip -o link show | grep -v "lo:" | awk -F': ' '{print $2}')
     local ssid=$(nmcli -t -f active,ssid dev wifi | grep '^yes' | cut -d':' -f2)
     ssid="${ssid:-No WiFi}"
     ssid="${ssid:0:15}"
-    local dwm=$(grep wlp0s20f3 /proc/net/wireless | awk '{ print int($4) }')
+    local dwm=$(grep "$iface" /proc/net/wireless | awk '{ print int($4) }')
     if [ "$ssid" = "No WiFi" ]; then
         local signal=0
     else 
