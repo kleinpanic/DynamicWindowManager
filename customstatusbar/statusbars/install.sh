@@ -32,7 +32,7 @@ for pkg in "${requires_packages[@]}"; do
         echo "Package $pkg is installed already. YAY"
     fi 
 done 
-sudo chmod +x statusbar.sh
+# sudo chmod +x statusbar.sh
 sudo cp statusbar.sh /usr/local/bin/statusbar
 
 PREFIX="$HOME/.local/share/statusbar"
