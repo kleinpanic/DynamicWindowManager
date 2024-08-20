@@ -6,10 +6,10 @@ command_exists() {
 }
 
 #DWM dependency is running
-if ! pgrep -x "dwm" > /dev/null; then
-    echo "DWM is not running. Please ensure that you got that shit installed and its your window manager."
-    exit 1
-fi
+#if ! pgrep -x "dwm" > /dev/null; then
+#    echo "DWM is not running. Please ensure that you got that shit installed and its your window manager."
+#    exit 1
+#fi
 
 #status2d dependency (update later if you find out how)
 if command_exists dwm; then
