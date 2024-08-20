@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
 # Source color vars
-source /home/klein/KleinWindowManagement/customstatusbar/statusbars/colorvars.sh
+source /home/klein/DynamicWindowManager/customstatusbar/statusbars/colorvars.sh
 
 # Define Basic Dimentions
 base_x=0
 base_y=2
-max_height=23
-bar_width=5
-gap=5
+max_height=15
+bar_width=3
+gap=1
 
 cpu() {
     local cpu_line1=$(grep '^cpu ' /proc/stat)
@@ -40,10 +40,10 @@ cpu() {
     local status_line=""
     status_line+="^c${grey}^^r${base_x},${base_y},${bar_width},${max_height}^"
     status_line+="^c${color}^^r${base_x},${usage_y},${bar_width},${usage_height}^"
-    status_line+="^d^^f7^"
-    local topcon=$( ps -eo %cpu,comm --sort=-%cpu | head -n 2 | tail -n 1 | awk '{print $2}')
-	topcon="${topcon:0:5}" # trunkate output
-    echo "{CPU:${status_line}${usage}% : ${topcon}}"
+    status_line+="^d^^f4^" # buffer of 1
+#    local topcon=$( ps -eo %cpu,comm --sort=-%cpu | head -n 2 | tail -n 1 | awk '{print $2}')
+#	topcon="${topcon:0:5}" # trunkate output
+    echo "{CPU:${status_line}${usage}%"
 }
 
 ram() {
@@ -51,37 +51,37 @@ ram() {
     local t_mem=$(echo "$m_mem" | awk '/^Mem:/ {print $2}')
     local u_mem=$(echo "$m_mem" | awk '/^Mem:/ {print $3}')
     local p_mem=$(awk "BEGIN {printf \"%.0f\", ($u_mem/$t_mem)*100}")
-    local usage_height=$((max_height * mem_usage / 100))
+    local usage_height=$((max_height * p_mem / 100))
     local usage_y=$((base_y + max_height - usage_height))
     local status_line=""
     status_line+="^c$grey^^r$base_x,${base_y},${bar_width},${max_height}^"
     status_line+="^c$white^^r${base_x},${usage_y},${bar_width},${usage_height}^"
-    status_line+="^d^^f7^"
+    status_line+="^d^^f4^" # buffer of 1
     status_line+="${p_mem}%"
-    echo "{Mem:$status_line}"
+    echo "M:$status_line"
 }
 
 swap() {
     local m_swap=$(free -m)
-    local t_swap=$(echo "$m_mem" | awk '/^Swap:/ {print $2}')
-    local u_swap=$(echo "$m_mem" | awk '/^Swap:/ {print $3}')
+    local t_swap=$(echo "$m_swap" | awk '/^Swap:/ {print $2}')
+    local u_swap=$(echo "$m_swap" | awk '/^Swap:/ {print $3}')
     if [[ "$u_swap" -eq 0 ]]; then
         return
     fi
     local p_swap=$(awk "BEGIN {printf \"%.0f\", ($u_swap/$t_swap)*100}")
-    local usage_height=$((max_height * mem_usage / 100))
+    local usage_height=$((max_height * u_swap / 100))
     local usage_y=$((base_y + max_height - usage_height))
     local status_line=""
     status_line+="^c$grey^^r$base_x,${base_y},${bar_width},${max_height}^"
     status_line+="^c$white^^r${base_x},${usage_y},${bar_width},${usage_height}^"
-    status_line+="^d^^f7^"
+    status_line+="^d^^f4^" # buffer of 1 
     status_line+="${p_swap}%"
-    echo "{Swap:$status_line}|"
+    echo "|S:$status_line"
 }
 
 disk() {
-    local usage_p2=$(df -h | grep '/dev/nvme0n1p2' | awk '{print $5}' | tr -d '%')
-    local usage_p4=$(df -h | grep '/dev/nvme0n1p4' | awk '{print $5}' | tr -d '%')
+    local usage_p2=$(df -h | grep '/dev/mmcblk0p2' | awk '{print $5}' | tr -d '%')
+    local usage_p4=$(df -h | grep '/dev/mmcblk0p1' | awk '{print $5}' | tr -d '%')
     if [[ ! "$usage_p2" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
         usage_p2=0
     fi
@@ -99,15 +99,15 @@ disk() {
         local usage_y=$((base_y + max_height - usage_height))
         status_line+="^c$grey^^r${base_x},${base_y},${bar_width},${max_height}^"
         status_line+="^c$white^^r${base_x},${usage_y},${bar_width},${usage_height}^"
-        base_x=$((base_x + bar_width +2))
+        base_x=$((base_x + bar_width + gap))
     done
-    status_line+="^d^^f15^"
-    echo "{Disk:${status_line}R:${usage_p2}%|U:${usage_p4}%}"
+    status_line+="^d^^f8^" #Buffer of 1
+    echo "DF:${status_line}R:${usage_p2}%-U:${usage_p4}%"
 }
 
 cpu_temperature(){
-    local temp=$(sensors | awk '/Package id 0/ {gsub(/[^0-9.]/, "", $4); print int($4)}')
-    local max_temp=70
+    local temp=$(awk '{print int($1 / 1000)}' /sys/class/thermal/thermal_zone0/temp)
+    local max_temp=80
     local color=$white
     if [ "$temp" -gt "$max_temp" ]; then
         color=$red
@@ -115,62 +115,74 @@ cpu_temperature(){
         color=$green
     fi
     local adj_y=5
-    local usage_height=$(($temp * 10 / $max_temp))
+    local usage_height=$(($temp * $max_height / $max_temp))
     local usage_y=$((adj_y + 10 - usage_height))
     local temp_icon="^c$black^"
-    temp_icon+="^r7,${base_y},5,15^" #Bar behind the fill
+    temp_icon+="^r5,14,8,5^" #two rectangles
+    temp_icon+="^r6,16,6,5^" #to mimic a circle
+    temp_icon+="^r7,${base_y},4,${max_height}^" #BG bar
     temp_icon+="^c$color^"
-    temp_icon+="^r8,${usage_y},3,${usage_height}^" # Fill Bar 
-    temp_icon+="^c$black^"
-    temp_icon+="^r4,17,11,5^" 
-    temp_icon+="^r5,19,9,6^"
-    temp_icon+="^d^^f15^"
-    echo "^c$white^{^d^$temp_icon $temp°C^c$white^}^d^"
+    temp_icon+="^r8,${usage_y},2,${usage_height}^" #C bar 
+    temp_icon+="^d^^f16^" #Buffer of 1
+    echo "${temp_icon}${temp}°C"
 }
 
 battery() {
-    local status=$(cat /sys/class/power_supply/BAT0/status)
-    local capacity=$(cat /sys/class/power_supply/BAT0/capacity)
-    local color=$white    
-    if [[ "$capacity" -le 15 ]]; then
-        color=$red
-    elif [[ "$capacity" -le 25 ]]; then
-        color=$yellow
-    else
-        color=$green
-    fi 
-    local adj_y=7
-    local fill_width=$(($capacity * 20 / 100))
-    local battery_icon="^c$black^"
-    battery_icon+="^r2,10,24,12^"
-    battery_icon+="^c$grey^"
-    battery_icon+="^r4,12,20,8^"
-    battery_icon+="^c$color^"
-    battery_icon+="^r4,12,$fill_width,8^"
-    battery_icon+="^c$black^"
-    battery_icon+="^r26,13,4,6^"
-    battery_icon+="^d^^f35^"
-    local color_status=$white
-    if [[ "$status" == "Full" ]]; then
-        color_status=$green
-    elif [[ "$status" == "Charging" ]]; then
-        color_status=$green
-    elif [[ "$status" == "Discharging" ]]; then
-        color_status=$grey
-    elif [[ "$status" == "Not charging" ]]; then
-        color_status=$white
-    else
-        status="NA"
+    local throttled=$(cat /sys/devices/platform/soc/soc:firmware/get_throttled)
+    local capacity=0
+    local status=""
+    
+    if [ $((throttled & 0x1)) -ne 0 ]; then
+        status+="Under-voltage detected"
     fi
-    local volt=$(sensors | awk '/BAT0-acpi-0/ {getline; getline; print $2}')
-    echo "{${battery_icon}^c${color_status}^${capacity}^d^% ${volt}V}"
+    if [ $((throttled & 0x2)) -ne 0 ]; then
+        status+="ARM frequency capped"
+    fi
+    if [ $((throttled & 0x4)) -ne 0 ]; then
+        status+="Currently throttled"
+    fi
+    if [ $((throttled & 0x8)) -ne 0 ]; then
+        status+="Soft temperature limit active"
+    fi
+    if [ $((throttled & 0x10000)) -ne 0 ]; then
+        status+="Under-voltage has occurred since last reboot"
+    fi
+    if [ $((throttled & 0x20000)) -ne 0 ]; then
+        status+="ARM frequency capped has occurred since last reboot"
+    fi
+    if [ $((throttled & 0x40000)) -ne 0 ]; then
+        status+="Throttling has occurred since last reboot"
+    fi
+    if [ $((throttled & 0x80000)) -ne 0 ]; then
+        status+="Soft temperature limit has occurred since last reboot"
+    fi
+
+    if [ "$throttled" -eq 0 ]; then
+        status+="No issues detected"
+        capacity=100
+    fi
+
+    # Check the core voltage using vcgencmd
+    local volt=$(vcgencmd measure_volts core | awk -F'=' '{print $2}')
+    local fill_width=$(($capacity * 9 / 100)) # corresponds to width of bar
+    local battery_icon="^c$black^"
+    battery_icon+="^r1,8,13,8^"
+    battery_icon+="^c$grey^"
+    battery_icon+="^r3,10,9,4^"
+    battery_icon+="^c$green^"
+    battery_icon+="^r3,10,$fill_width,4^"
+    battery_icon+="^c$black^"
+    battery_icon+="^r14,9,2,4^"
+    battery_icon+="^d^^f17^" #Buffer of 1
+    echo "${battery_icon}${volt}"
 }
 
 wifi() {
+    local iface=$(ip -o link show | grep -v "lo:" | awk -F': ' '{print $2}');
     local ssid=$(nmcli -t -f active,ssid dev wifi | grep '^yes' | cut -d':' -f2)
     ssid="${ssid:-No WiFi}"
-    ssid="${ssid:0:15}"
-    local dwm=$(grep wlp0s20f3 /proc/net/wireless | awk '{ print int($4) }')
+    ssid="${ssid:0:5}"
+    local dwm=$(grep "$iface" /proc/net/wireless | awk '{ print int($4) }')
     if [ "$ssid" = "No WiFi" ]; then
         local signal=0
     else 
@@ -198,23 +210,24 @@ wifi() {
 
     local wifi_icon="^c$color^"
     for i in 1 2 3 4 5; do
-        local width=$((3 * i + 1))
-        local height=$((3 * i + 1))
-        local adj_y=$((max_height - height))
+        local width=$(( (3 * i) ))
+        local height=$(( (3 * i) ))
+        local adj_y=$((max_height - height + 2))
         if [ $i -le $bars_filled ]; then
             wifi_icon+="^c$color^"
         else
             wifi_icon+="^c$grey^"
         fi
-        wifi_icon+="^r$((base_x + 4 * (i - 2))),$adj_y,$width,$height^"
+        wifi_icon+="^r$((base_x + 2 * ( i - 3 ))),$((adj_y + 2)),$width,$height^"
     done
-    wifi_icon+="^d^^f17^"
+    wifi_icon+="^d^^f7^"
 
-    echo "{ $wifi_icon$ssid : $signal% }"
+    echo " ${wifi_icon}${ssid} ${signal}%}"
 }
 status(){
     echo "$(cpu)|$(ram)|$(swap)$(disk)|$(cpu_temperature)|$(battery)|$(wifi)"
 }
 while true; do
+    DISPLAY=:0
     xsetroot -name "$(status)"
 done
