@@ -32,7 +32,11 @@ for pkg in "${requires_packages[@]}"; do
         echo "Package $pkg is installed already. YAY"
     fi 
 done 
-sudo chmod +x /home/klein/DynamicWindowManagement//customstatusbar/statusbars/statusbar.sh
-sudo ln -s /home/klein/DynamicWindowManagement/customstatusbar/statusbars/statusbar.sh /usr/local/bin/statusbar
+sudo chmod +x statusbar.sh
+sudo cp statusbar.sh /usr/local/bin/statusbar
+
+PREFIX="$HOME/.local/share/statusbar"
+mkdir -p "$PREFIX"
+cp colorvars.sh "$PREFIX"
 
 echo "Installation done. Run statusbar in shell. Installed to local bin"

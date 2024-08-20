@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Source color vars
-source /home/klein/DynamicWindowManagement/customstatusbar/statusbars/colorvars.sh
+source "$HOME/.local/share/statusbar/colorvars.sh"
 
 # Define Basic Dimentions
 base_x=0
