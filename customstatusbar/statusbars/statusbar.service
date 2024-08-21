@@ -5,6 +5,7 @@ After=graphical.target
 [Service]
 Type=simple
 ExecStart=/usr/local/bin/statusbar
+User=klein
 Restart=on-failure
 Environment=DISPLAY=:0
 Environment=XAUTHORITY=/home/klein/.Xauthority
