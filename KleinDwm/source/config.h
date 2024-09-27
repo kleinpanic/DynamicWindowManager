@@ -3,7 +3,6 @@
 #include "colors/space.h"
 #include "keys.h"
 
-#define TERMINAL	"st"              // default terminal appearance */
 #define ICONSIZE 20   /* icon size */
 #define ICONSPACING 5 /* space between icon and title */
 static const unsigned int borderpx  = 2;        /* border pixel of windows */

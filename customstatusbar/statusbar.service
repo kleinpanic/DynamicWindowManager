@@ -1,6 +1,6 @@
 [Unit]
 Description=SystemBar for DWM from suckless
-After=graphical.target
+After=default.target
 
 [Service]
 Type=simple
@@ -11,4 +11,4 @@ Environment=DISPLAY=:0
 Environment=XAUTHORITY=/home/klein/.Xauthority
 
 [Install]
-WantedBy=graphical.target
+WantedBy=default.target
