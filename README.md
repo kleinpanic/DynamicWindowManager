@@ -1,3 +1,9 @@
-# Suckless Installs - Programs associated with my window manager, and my window manager.
-## Purpose
-I pretty much use this as my backup system (for my window manage)
+# Custom Suckless Dynamic Window Manager with added patches.
+
+## Includes
+- The DWM source.
+- Statusbar with bash using status2d patches
+- slstatus
+- st (simple terminal with changes)
+- pinentry-dmenu
+- dmen
