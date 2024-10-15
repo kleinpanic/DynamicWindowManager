@@ -2,7 +2,7 @@
 #include "movestack.c"
 #include <X11/XF86keysym.h>
 
-#define TERMINAL	"alacritty"           // default terminal 
+#define TERMINAL	"st"           // default terminal 
 
 /* key definitions */
 #define MODKEY Mod4Mask
