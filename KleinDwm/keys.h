@@ -79,7 +79,7 @@ static const Key keys[] = {
         { MODKEY,     XK_c,     XK_b,    spawn,     SHCMD("xdotool key Super_L+3 && qutebrowser") },
         { MODKEY,     XK_c,     XK_f,    spawn,     SHCMD("xdotool key Super_L+4 && freetube") },
         { MODKEY,     XK_c,     XK_g,    spawn,     SHCMD("xdotool key Super_L+5 && qutebrowser github.com") },
-        { MODKEY,     XK_c,     XK_n,    spawn,     SHCMD("xdotool key Super_L+7 && nvim") },
+        { MODKEY,     XK_c,     XK_n,    spawn,     SHCMD("xdotool key Super_L+7 && st nvim") },
         { MODKEY,     XK_c,     XK_s,    spawn,     SHCMD("xdotool key Super_L+8 && spotube") }, 
 		{ MODKEY,     XK_c,     XK_z,    spawn,     SHCMD("xdotool key Super_L+9 && alacritty") },
 		{ MODKEY,     XK_n,     XK_v,    spawn,     {.v = nvimcmd } },
