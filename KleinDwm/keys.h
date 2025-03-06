@@ -28,8 +28,6 @@ static const char *termcmd[]  = { TERMINAL, NULL };
 static const char *inc_light[] = { "brightness", "-a", "up", NULL};
 static const char *dec_light[] = { "brightness", "-a", "down", NULL };
 
-/*xrandr control gui wrapper*/
-static const char *xrandrwrap[] = { "xrandrwrap", NULL };
 /* screenshot command */
 static const char *scrotselcmd[] = { "scrot", "-s", "/home/klein/Pictures/screenshots/Screenshot_%Y-%m-%d_%H-%M-%S.png", NULL };
 
@@ -100,7 +98,8 @@ static const Key keys[] = {
 		{ 0,						    -1,			XK_F10,	   spawn,		   { .v = scrotselcmd } },
 		{ 0,			                -1,       	XF86XK_MonBrightnessUp,	 spawn,	       { .v = inc_light } },
 	    { 0,				            -1,         XF86XK_MonBrightnessDown, spawn,	       { .v = dec_light } },
-        { 0,                            -1,         XK_F8,      spawn,      { .v = xrandrwrap } },
+		{ MODKEY|ShiftMask,  -1,  XK_l,  spawn,  SHCMD("slock") }
+
 };
 
 /* button definitions */
