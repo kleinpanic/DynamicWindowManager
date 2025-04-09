@@ -10,6 +10,94 @@ max_height=23
 bar_width=5
 gap=5
 
+clock() {
+    # Adjusted dimensions for the clock icon
+    local icon_width=18
+    local icon_height=$((max_height - 2))
+    
+    # Determine the center of the icon (for the dial)
+    local center_x=$((base_x + icon_width / 2))
+    local center_y=$((base_y + icon_height / 2))
+
+    # Begin drawing the clock icon.
+    # Outer border (clock frame) in medium gray.
+    local clock_icon=""
+    clock_icon+="^c#888888^"
+    clock_icon+="^r${base_x},${base_y},${icon_width},${icon_height}^"
+    # Inner dial (face), inset by 3 pixels on all sides.
+    clock_icon+="^c#000000^"
+    clock_icon+="^r$((base_x + 3)),$((base_y + 3)),$((icon_width - 6)),$((icon_height - 6))^"
+    
+    # Get current time details.
+    local hour=$(date +%H)
+    local minute=$(date +%M)
+    hour=$((10#$hour))
+    minute=$((10#$minute))
+    
+    # Calculate angles in radians.
+    # Hour hand: each hour is 30° plus half a degree per minute.
+    local hour_angle
+    hour_angle=$(awk -v h="$hour" -v m="$minute" 'BEGIN {
+    printf "%.2f", ((-((h % 12) * 30 + m * 0.5) + 90) * 3.14159265 / 180)
+    }')
+    # Minute hand: each minute represents 6°.
+    local minute_angle
+    minute_angle=$(awk -v m="$minute" 'BEGIN {
+    printf "%.2f", ((-(m * 6) + 90) * 3.14159265 / 180)
+    }')
+
+    # Define inner radius from inner dial (the dial drawn is (icon_width-6) wide).
+    local inner_radius=$(( (icon_width - 6) / 2 ))
+    # Define hand lengths as fractions of the inner radius.
+    local hour_hand_length
+    hour_hand_length=$(awk -v r="$inner_radius" 'BEGIN { printf "%d", r * 0.6 }')
+    local minute_hand_length
+    minute_hand_length=$(awk -v r="$inner_radius" 'BEGIN { printf "%d", r * 0.9 }')
+
+    # Function to draw a hand from the center to a given length with specified angle and color.
+    # It draws a series of 1x1 pixel rectangles along the hand's path.
+    draw_hand() {
+        local length=$1
+        local angle=$2
+        local color=$3
+        local hand_line=""
+        for (( i=0; i<=length; i++ )); do
+            # Compute x and y offset using AWK's cosine and sine functions.
+            local dx
+            dx=$(awk -v i="$i" -v a="$angle" 'BEGIN { printf "%d", i * cos(a) }')
+            local dy
+            dy=$(awk -v i="$i" -v a="$angle" 'BEGIN { printf "%d", i * sin(a) }')
+            # Note: subtract dy because screen y coordinates increase downward.
+            local px=$(( center_x + dx ))
+            local py=$(( center_y - dy ))
+            hand_line+="^c${color}^"
+            hand_line+="^r${px},${py},1,1^"
+        done
+        echo -n "${hand_line}"
+    }
+
+    # Draw the hour hand (white) and the minute hand (light gray).
+    local hour_line
+    hour_line=$(draw_hand "$hour_hand_length" "$hour_angle" "#FFFFFF")
+    local minute_line
+    minute_line=$(draw_hand "$minute_hand_length" "$minute_angle" "#AAAAAA")
+
+    # Append the hand drawings to the clock icon.
+    clock_icon+="${hour_line}${minute_line}"
+    
+    # Decrease the gap between the icon and the time text by forwarding the drawing cursor by a smaller amount.
+    # Here, we move the cursor by icon_width + gap - 2 pixels.
+    clock_icon+="^d^^f$(( icon_width + gap - 2 ))^"
+    
+    # Fetch the current time (military format HH:MM) with no background.
+    local time_str
+    time_str=$(date +%H:%M:%S)
+    local time_text="^c#FFFFFF^ ${time_str} ^d^"
+    
+    # Output the complete clock icon and time text without any label.
+    echo "${clock_icon}${time_text}"
+}
+
 cpu() {
     local cpu_line1=$(grep '^cpu ' /proc/stat)
     sleep 2
@@ -141,13 +229,13 @@ battery() {
     fi 
     local adj_y=7
     local fill_width=$(($capacity * 20 / 100))
-    local battery_icon="^c$black^"
+    local battery_icon="^c$white^"
     battery_icon+="^r2,10,24,12^"
     battery_icon+="^c$grey^"
     battery_icon+="^r4,12,20,8^"
     battery_icon+="^c$color^"
     battery_icon+="^r4,12,$fill_width,8^"
-    battery_icon+="^c$black^"
+    battery_icon+="^c$white^"
     battery_icon+="^r26,13,4,6^"
     battery_icon+="^d^^f35^"
     local color_status=$white
@@ -215,7 +303,7 @@ wifi() {
 }
 
 status(){
-    echo "$(cpu)|$(ram)|$(swap)$(disk)|$(cpu_temperature)|$(battery)|$(wifi)"
+    echo "$(clock)|$(cpu)|$(ram)|$(swap)$(disk)|$(cpu_temperature)|$(battery)|$(wifi)"
 }
 while true; do
     xsetroot -name "$(status)"
