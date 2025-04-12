@@ -17,16 +17,16 @@ clock() {
     
     # Determine the center of the icon (for the dial)
     local center_x=$((base_x + icon_width / 2))
-    local center_y=$((base_y + icon_height / 2))
+    local center_y=$(((base_y + 2) + icon_height / 2))
 
     # Begin drawing the clock icon.
     # Outer border (clock frame) in medium gray.
     local clock_icon=""
     clock_icon+="^c#888888^"
-    clock_icon+="^r${base_x},${base_y},${icon_width},${icon_height}^"
+    clock_icon+="^r${base_x},$((base_y + 2)),${icon_width},${icon_height}^"
     # Inner dial (face), inset by 3 pixels on all sides.
     clock_icon+="^c#000000^"
-    clock_icon+="^r$((base_x + 3)),$((base_y + 3)),$((icon_width - 6)),$((icon_height - 6))^"
+    clock_icon+="^r$((base_x + 3)),$((base_y + 5)),$((icon_width - 6)),$((icon_height - 6))^"
     
     # Get current time details.
     local hour=$(date +%H)
