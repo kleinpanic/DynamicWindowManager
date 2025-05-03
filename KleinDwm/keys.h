@@ -25,8 +25,8 @@ static const char *termcmd[]  = { TERMINAL, NULL };
 
 
 /* brightness control */
-static const char *inc_light[] = { "brightness", "-a", "up", NULL};
-static const char *dec_light[] = { "brightness", "-a", "down", NULL };
+static const char *inc_light[] = { "lumos", "-a", "up", NULL};
+static const char *dec_light[] = { "lumos", "-a", "down", NULL };
 
 /* screenshot command */
 static const char *scrotselcmd[] = { "scrot", "-s", "/home/klein/Pictures/screenshots/Screenshot_%Y-%m-%d_%H-%M-%S.png", NULL };
