@@ -34,7 +34,7 @@ static const Rule rules[] = {
 	/* class        instance    title       tags mask     isfloating  CenterThisWindow?  monitor */
 	{ "Gimp",       NULL,       NULL,       0,            1,          0,                 -1 },
 	{ "Tk",         NULL,       NULL,       0,            1,          0,                 -1 },
-    { NULL,         NULL, "Brightness Control", 0,        1,          0,                 -1 },
+    { NULL,         NULL, "lumos", 0,        1,          0,                 -1 },
     { NULL,         NULL, "Screenshot Tool", 0,           1,          0,                 -1 },
 	{ "Conky",	    NULL,		NULL,		0,		  1,		  0,                 -1 },
 	{ NULL,		    NULL, "Task Tray",      0,	      1,	      0,                 -1 },
