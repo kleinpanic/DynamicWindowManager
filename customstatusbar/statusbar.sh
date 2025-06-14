@@ -22,7 +22,7 @@ clock() {
     # Begin drawing the clock icon.
     # Outer border (clock frame) in medium gray.
     local clock_icon=""
-    clock_icon+="^c#888888^"
+    clock_icon+="^c${grey}^"
     clock_icon+="^r${base_x},$((base_y + 2)),${icon_width},${icon_height}^"
     # Inner dial (face), inset by 3 pixels on all sides.
     clock_icon+="^c#000000^"
@@ -92,7 +92,7 @@ clock() {
     # Fetch the current time (military format HH:MM) with no background.
     local time_str
     time_str=$(date +%H:%M:%S)
-    local time_text="^c#FFFFFF^ ${time_str} ^d^"
+    local time_text="${time_str} ^d^"
     
     # Output the complete clock icon and time text without any label.
     echo "${clock_icon}${time_text}"
